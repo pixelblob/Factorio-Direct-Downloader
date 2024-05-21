@@ -5,41 +5,32 @@
 // @description  try to take over the world!
 // @author       Pixelblob
 // @match        https://mods.factorio.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=factorio.com
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=re146.dev/factorio/mods
 // @grant        none
 // ==/UserScript==
 
 (function() {
     'use strict';
-    var mods = Array.from(document.querySelectorAll("a")).filter(a=>a.href).filter(a=>new URL(a.href).searchParams.get("next")?.startsWith?.("/mod/"))
 
-    mods.forEach(async mod=>{
-        if (!mod.href) return
-        var modName = new URL(mod.href).searchParams.get("next").split("/").at(-1)
-        mod.removeAttribute("href")
-        //let data = await (await fetch("https://mods.factorio.com/api/mods/"+modName)).json()
-        //var version = data.releases.at(-1).version
-        //var downloadLink = `https://mods-storage.re146.dev/${modName}/${version}.zip`
-        //console.log(downloadLink)
-        //mod.href=downloadLink
-
-        mod.onclick=function() {
-            getModDownloadLink(modName).then(downloadLink=>{
-                mod.onclick=null
-                mod.href=downloadLink
-                window.open(downloadLink, '_blank')
-                //mod.click()
-            })
-            return false
+    const buttons = document.getElementsByClassName('button-green');
+    for (const button of buttons) {
+        if (button.innerText.trim() !== 'Download') {
+            continue;
         }
-
-    })
-
-    async function getModDownloadLink(modName) {
-        let data = await (await fetch("https://mods.factorio.com/api/mods/"+modName)).json()
-        var version = data.releases.at(-1).version
-        var downloadLink = `https://mods-storage.re146.dev/${modName}/${version}.zip`
-        return downloadLink
+        var modName = new URL(button.href).searchParams.get("next").split("/")[2]
+        console.log(button)
+        //if (!button.getAttribute('href').startsWith('/login?next=')) {
+        //    continue;
+        //}
+        if (button.parentElement.tagName === 'DIV') {
+            //button.innerText = 'Download from re146.dev';
+            button.setAttribute('target', '_blank');
+            button.setAttribute('href', `https://pixelboop.net/factorio/${modName}`);
+        } else if (button.parentElement.tagName === 'TD') {
+            //button.innerText = 'Download from re146.dev';
+            button.setAttribute('target', '_blank');
+            const version = button.parentElement.parentElement.children[0].innerText;
+            button.setAttribute('href', `https://mods-storage.re146.dev/${modName}/${version}.zip`);
+        }
     }
-    // Your code here...
 })();
